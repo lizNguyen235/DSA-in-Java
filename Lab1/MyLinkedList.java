@@ -1,120 +1,127 @@
 import java.util.NoSuchElementException;
 
-public class MyLinkedList<E> {
-    protected Node<E> head;
-    protected int numNode;
+public class MyLinkedList<E> implements MyList<E> {
+    private Node<E> head;
+    private int size;
 
+    public MyLinkedList() {
+        head = null;
+        size = 0;
+    }
     public void addFirst(E item) {
-        head = new Node<E>(item, head);
-        numNode++;
+        if(head == null) {
+            head = new Node<E>(item, null);
+        } else {
+            head = new Node<E>(item, head);
+        }
+        size++;
     }
-
     public void addAfter(Node<E> curr, E item) {
-        if (curr == null) {
-            addFirst(item);
-        } else {
-            curr.setNext(new Node<E>(item, curr.getNext()));
-            numNode++;
+        if(curr == null) {
+            throw new IllegalArgumentException("Node cannot be null");
         }
+        Node<E> newNode = new Node<E>(item, curr.getNext());
+        curr.setNext(newNode);
+        size++;
     }
-
     public void addLast(E item) {
-        if (head == null) {
-            addAfter(head, item);
-        } else {
-            Node<E> tmp = head;
-            while (tmp.getNext() != null) {
-                tmp = tmp.getNext();
+        if(head == null) {
+            addFirst(item);
+        }
+        else {
+            Node<E> curr = head;
+            // Traverse to the last node
+            while(curr.getNext() != null) {
+                curr = curr.getNext();
             }
-            tmp.setNext(new Node<E>(item, tmp.getNext()));
-            numNode++;
+            curr.setNext(new Node<E>(item, null));
+            size++;
         }
     }
-
-    public E removeFirst() throws NoSuchElementException {
-        if (head == null) {
-            throw new NoSuchElementException("can not element from an empty list");
-        } else {
-            E tmp = head.getData();
-            head = head.getNext();
-            numNode--;
-            return tmp;
+    public E removeFirst() {
+        if(head == null) {
+            throw new NoSuchElementException("List is empty");
         }
+        E item = head.getItem();
+        head = head.getNext();
+        size--;
+        return item;
     }
-
-    public E removeAfter(Node<E> curr) throws NoSuchElementException {
-        if (curr == null) {
-            throw new NoSuchElementException("can not element from an empty list");
-        } else {
-            E tmp = curr.getData();
-            curr.setNext(curr.getNext());
-            numNode--;
-            return tmp;
+    public E removeAfter(Node<E> curr) {
+        if(curr == null || curr.getNext() == null) {
+            throw new IllegalArgumentException("Node cannot be null or last node");
         }
+        E item = curr.getNext().getItem();
+        curr.setNext(curr.getNext().getNext());
+        size--;
+        return item;
     }
-
-    public E removeLast() throws NoSuchElementException {
-        if (head == null) {
-            throw new NoSuchElementException("can not element from an empty list");
-        } else {
-            if (numNode == 1) {
-                return removeFirst();
-            }
-            Node<E> tmp = head;
-            while (tmp.getNext().getNext() != null) {
-                tmp = tmp.getNext();
-            }
-            E item = tmp.getNext().getData();
-            tmp.setNext(null);
-            numNode--;
-            return item;
+    public E removeLast() {
+        if(head == null) {
+            throw new NoSuchElementException("List is empty");
         }
-    }
-
-    public int size() {
-        return numNode;
-    }
-
-    public boolean contains(E item) {
-        for (Node<E> curr = head; curr != null; curr = curr.getNext()) {
-            if (curr.getData().equals(item)) {
-                return true;
-            }
+        if(head.getNext() == null) {
+            return removeFirst();
         }
-        return false;
+        Node<E> curr = head;
+        while(curr.getNext().getNext() != null) {
+            curr = curr.getNext();
+        }
+        E item = curr.getNext().getItem();
+        curr.setNext(null);
+        size--;
+        return item;
     }
-
     public void print() {
-        for (Node<E> tmp = head; tmp != null; tmp = tmp.getNext()) {
-            System.out.print(tmp.getData() + " ");
+        Node<E> curr = head;
+        while(curr != null) {
+            System.out.print(curr.getItem() + " ");
+            curr = curr.getNext();
         }
         System.out.println();
     }
-
     public boolean isEmpty() {
-        return numNode == 0;
+        return head == null;
     }
-
+    public E getFirst() {
+        if(head == null) {
+            throw new NoSuchElementException("List is empty");
+        }
+        return head.getItem();
+    }
     public Node<E> getHead() {
         return head;
     }
-
-    public E getFirst() {
-        return head.getData();
+    public void setHead(Node<E> head) {
+        this.head = head;
     }
-
-    public E removeCurr(Node<E> curr) throws NoSuchElementException {
-        if (curr == null) {
-            throw new NoSuchElementException("can not element from an empty list");
-        }
-        E tmp = curr.getData();
-        for (Node<E> I = head; I != null; I = I.getNext()) {
-            if (I.getNext() == curr) {
-                I.setNext(curr.getNext());
-                return tmp;
+    public int size() {
+        return size;
+    }
+    public boolean contains(E item) {
+        Node<E> curr = head;
+        while(curr != null) {
+            if(curr.getItem().equals(item)) {
+                return true;
             }
+            curr = curr.getNext();
         }
-        return tmp;
+        return false;
     }
-
+    public E removeCurr(Node<E> curr) {
+        if(curr == null) {
+            throw new IllegalArgumentException("Node cannot be null");
+        }
+        if(curr == head) {
+            return removeFirst();
+        }
+        Node<E> prev = head;
+        while(prev.getNext() != curr) {
+            prev = prev.getNext();
+        }
+        E item = curr.getItem();
+        prev.setNext(curr.getNext());
+        size--;
+        return item;
+    }
 }
