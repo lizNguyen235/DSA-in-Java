@@ -3,14 +3,14 @@ import Queue.MyQueue;
 
 public class ArrayQueue<E> implements MyQueue<E> {
     private E[] data;
-    private int front = 0;
-    private int rear = -1;
+    private int front;
+    private int rear;
     private int count = 0;
     @SuppressWarnings("unchecked")
     public ArrayQueue() {
         this.data = (E[]) new Object[1000];
         this.front = 0;
-        this.rear = data.length - 1;
+        this.rear = -1;
     }
     public E[] resize(int newSize) {
         @SuppressWarnings("unchecked")
