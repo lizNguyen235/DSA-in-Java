@@ -1,5 +1,5 @@
 public class BST<E extends Comparable<E>> {
-    private Node<E> root;
+    protected Node<E> root;
 
     public BST() {
         this.root = null;
@@ -116,53 +116,77 @@ public class BST<E extends Comparable<E>> {
     }
 
     public E deleteMin() {
-        return deleteMin(root);
+        if(root == null) {
+            return null;
+        }
+        return deleteMin(root).getData();
     }
 
-    private E deleteMin(Node<E> node) {
-        if(node.getLeft().getLeft() == null) {
-            E data = node.getLeft().getData();
-            node.setLeft(node.getLeft().getRight());
-            return data;
-        }
-        return deleteMin(node.getLeft());
+    private Node<E> deleteMin(Node<E> node) {
+       if(node.getLeft() == null) {
+           return node.getRight();
+       }
+        node.setLeft(deleteMin(node.getLeft()));
+        return node;
     }
 
     public void delete(E data) {
+        if(root == null) {
+            return;
+        }
         delete(root, data);
     }
 
-    private void delete(Node<E> node, E data) {
+    private Node<E> delete(Node<E> node, E data) {
        int compare = data.compareTo(node.getData());
        if(compare > 0) { // data > node.getData()
-            delete(node.getRight(), data);
+            node.setRight(delete(node.getRight(), data));
         }
         else if(compare < 0) { // data < node.getData()
-            delete(node.getLeft(), data);
+            node.setLeft(delete(node.getLeft(), data));
         }
         else { 
             if(node.getLeft() == null) {
-                node = node.getRight();
+                return node.getRight();
             }
             else if(node.getRight() == null) {
-                node = node.getLeft();
+                return node.getLeft();
             }
             else {
-                node.setData(deleteMin(node.getRight()));
+                node.setData(deleteMin(node.getRight()).getData());
             }
+        }
+        return node;
+    }
+
+    public boolean contains(E data) {
+        return contains(root, data);
+    }
+
+    private boolean contains(Node<E> node, E data) {
+        if(node == null) {
+            return false;
+        }
+        int compare = data.compareTo(node.getData());
+        if(compare > 0) {
+            return contains(node.getRight(), data);
+        }
+        else if(compare < 0) {
+            return contains(node.getLeft(), data);
+        }
+        else {
+            return true;
         }
     }
 
+    public int Height() {
+        return Height(root);
+    }
 
-    public static void main(String[] args) {
-        BST<Integer> bst = new BST<Integer>();
-        bst.insert(5);
-        bst.insert(3);
-        bst.insert(7);
-        bst.insert(1);
-        bst.insert(1);
-        bst.insert(-1);
-        bst.insert(8);
-        bst.insert(26);
+    private int Height(Node<E> node) {
+        if(node == null) {
+            return -1;
+        }
+        return 1 + Math.max(Height(node.getLeft()), Height(node.getRight()));
     }
 }
